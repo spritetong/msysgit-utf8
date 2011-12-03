@@ -185,3 +185,9 @@ elif [ -e ~/.bash_profile ]; then
 elif [ -e /etc/bash_profile ]; then
     . /etc/bash_profile
 fi
+
+# **************** For UTF-8 >>>>>>>>>>>>>>>>
+export LESSCHARSET=utf-8
+# --show-control-chars: help showing Chinese, Korean or accented characters
+alias ls='ls -F --color --show-control-chars'
+# <<<<<<<<<<<<<<<< **************************

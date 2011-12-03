@@ -71,7 +71,9 @@ test "$do_compile" && {
 			git commit -m "Git for Windows $version"
 		 fi) &&
 		(cd git &&
-		 create_msysgit_tag $version &&
+		 # For UTF-8 version, release-utf8.sh will create a new tag.
+		 # Modified by Sprite Tong, 12/1/2011.
+		 #create_msysgit_tag $version &&
 		 make install) &&
 		(cd src/git-cheetah/explorer/ && make)
 	} || exit 1

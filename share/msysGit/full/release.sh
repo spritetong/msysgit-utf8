@@ -38,8 +38,10 @@ sed "s|^|msysGit/|" > $LIST &&
 
 # make installer
 test -f "$TARGET".7z && rm "$TARGET".7z
+sort -u $LIST > $LIST.tmp && cp $LIST.tmp $LIST && rm $LIST.tmp
 OPTS7="-m0=lzma -mx=9 -md=64M" &&
 /share/7-Zip/7za.exe a $OPTS7 "$TARGET".7z @$LIST &&
+rm $LIST &&
 
 (cat /share/7-Zip/7zSD.sfx &&
  echo ';!@Install@!UTF-8!' &&
