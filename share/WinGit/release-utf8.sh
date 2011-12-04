@@ -17,8 +17,15 @@ cd /
 git tag -d Git-$version-msysgit-utf8 >nul 2>nul
 popd >nul
 
+# Change curl-ca-bundle.crt
+cmd /c "..\\..\\cmd\\git-config-win.cmd"
+
 ./release.sh -f $version-msysgit-utf8
 
+# Restore curl-ca-bundle.crt
+git checkout -f ../../mingw/bin/curl-ca-bundle.crt
+
+# Move installer
 installer=\"$(tail -n 1 /tmp/install.out)\"
 dest=\"..\\..\\..\\Git-$version-msysgit-utf8.exe\"
 echo Move installer to $dest ...
