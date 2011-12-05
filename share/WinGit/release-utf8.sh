@@ -1,32 +1,38 @@
 #!/bin/bash
 
-if test $# -lt 2
+if test $# -lt 1
 then
     echo 'Usage:'
-    echo '   ./release-utf8.sh <version> <build-number>'
+    echo '   ./release-utf8.sh <version>'
     exit
 fi
 
 version=$1
-build=$2
+build=$(date +%Y%m%d)
+fullversion=$version-msysgit-utf8-$build
+
+echo $fullversion>/git/version
 
 pushd /git >nul
-git tag -d v$version-msysgit-utf8.$build >nul 2>nul
-git tag    v$version-msysgit-utf8.$build
+git tag -d v$fullversion >nul 2>nul
+git tag    v$fullversion
 cd /
-git tag -d Git-$version-msysgit-utf8 >nul 2>nul
+git tag -d Git-$fullversion >nul 2>nul
 popd >nul
 
 # Change curl-ca-bundle.crt
 cmd /c "..\\..\\cmd\\git-config-win.cmd"
 
-./release.sh -f $version-msysgit-utf8
+./release.sh -f $fullversion
 
 # Restore curl-ca-bundle.crt
 git checkout -f ../../mingw/bin/curl-ca-bundle.crt
 
+# Delete version file
+rm -f /git/version
+
 # Move installer
 installer=\"$(tail -n 1 /tmp/install.out)\"
-dest=\"..\\..\\..\\Git-$version-msysgit-utf8.exe\"
+dest=\"..\\..\\..\\Git-$fullversion.exe\"
 echo Move installer to $dest ...
 cmd /c "move /y $installer $dest"
