@@ -9,8 +9,8 @@ rem git config --global user.email your-name@email.com
 rem *********************** Windows CRLF
 rem git config --global core.autocrlf true
 rem git config --global core.safecrlf false
-rem *********************** Show Chinese log. Choose encoding method for other languages.
-rem git config --global i18n.logoutputencoding gbk
+rem *********************** Show Unicode log.
+rem git config --global i18n.logoutputencoding utf-8
 goto :EOF
 
 :add_custom_cacerts

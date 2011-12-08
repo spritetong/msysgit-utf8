@@ -78,11 +78,11 @@ rem ***** function :git_svn_fetch(dir)
 echo.
 echo --------------------------------------------------
 echo %~1
-echo --^> Rebasing...
+echo --^> Fetching...
+call git-svn-fetch %1
 if exist "%~1\.git\svn" (
-	call :git_do_cmd %1 svn rebase
-) else (
-	call :git_do_cmd %1 svn fetch
+echo --^> Rebasing...
+	call git-svn-fetch --rebase %1
 )
 if %UPDATE_WITH_GC% equ 1 (
 	echo --^> Packing  ...

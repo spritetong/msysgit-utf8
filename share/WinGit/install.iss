@@ -845,7 +845,11 @@ begin
         // Delete any duplicate files in case we are updating from a non-libexec to a libexec directory layout.
         if FindFirst(AppDir+'\libexec\git-core\*',FindRec) then begin
             repeat
-                if (FindRec.Attributes and FILE_ATTRIBUTE_DIRECTORY)=0 then begin
+                if ((FindRec.Attributes and FILE_ATTRIBUTE_DIRECTORY)=0)
+                        //********** Added by Sprite Tong, 12/7/2011. *********
+                        and (FindRec.name<>'libiconv-2.dll')
+                        //*****************************************************
+                    then begin
                     FileName:=AppDir+'\bin\'+FindRec.name;
                     if (Pos(FindRec.name,'git.exe')<>1) and FileExists(FileName) and (not DeleteFile(FileName)) then begin
                         Log('Line {#__LINE__}: Unable to delete dupe "'+FileName+'", ignoring.');

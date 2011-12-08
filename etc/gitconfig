@@ -7,7 +7,7 @@
 	encoding = utf-8
 [i18n]
 	commitencoding = utf-8
-	logoutputencoding = gbk
+	logoutputencoding = utf-8
 # <<<<<<<<<<<<<<<< **************************
 [color]
 	diff = auto

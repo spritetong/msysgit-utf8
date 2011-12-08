@@ -23,6 +23,9 @@ popd >nul
 # Change curl-ca-bundle.crt
 cmd /c "..\\..\\cmd\\git-config-win.cmd"
 
+# Copy libiconv-2.dll
+cp /mingw/bin/libiconv-2.dll /libexec/git-core/
+
 ./release.sh -f $fullversion
 
 # Restore curl-ca-bundle.crt

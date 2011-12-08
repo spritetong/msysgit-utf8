@@ -94,6 +94,9 @@ cp $MSYSGITROOT/share/WinGit/Git\ Bash.vbs . &&
 mkdir git-cheetah &&
 cp $MSYSGITROOT/src/git-cheetah/explorer/git_shell_ext.dll git-cheetah/ &&
 cp $MSYSGITROOT/share/WinGit/ReleaseNotes.rtf . &&
+# *********** Added by Sprite Tong, 12/7/2011. ****************
+cp $MSYSGITROOT/mingw/bin/libiconv-2.dll libexec/git-core/ &&
+# *************************************************************
 sed 's/^\. .*\(git-completion.bash\)/. \/etc\/\1/' \
 	< $MSYSGITROOT/etc/profile > etc/profile &&
 cp $MSYSGITROOT/share/resources/git.ico etc/ ||
