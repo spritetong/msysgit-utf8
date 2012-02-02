@@ -6,4 +6,4 @@
 	url = https://git.tch.25u.com/git/opensource/git/git-htmldocs.git
 [submodule "git-cheetah"]
 	path = src/git-cheetah
-	url = https://git.tch.25u.com/git/opensource/git/git-cheetah.git
+	url = https://git.tch.25u.com/git/opensource/git/msysgit/git-cheetah.git
