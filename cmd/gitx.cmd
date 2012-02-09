@@ -101,10 +101,16 @@ if %errorlevel% neq 0 (
 	goto :EOF
 )
 pushd %git_install_root%\cmd >nul
+call :gmi_upgrade
 call :gmi_config
 call :gmi_add_custom_cacerts
 call :gmi_set_all_loaders
 popd
+goto :EOF
+
+:gmi_upgrade
+if exist CustomCA.crt       ren CustomCA.crt custom-ca-bundle.crt >nul 2>nul
+if exist git-config-win.cmd rm -f git-config-win.cmd git-svn-fetch.cmd git-update-dir.cmd
 goto :EOF
 
 :gmi_config
