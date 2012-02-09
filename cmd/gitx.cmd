@@ -129,7 +129,7 @@ goto :EOF
 :gmi_update_ca_bundle
 set curl-ca-bundle=%1
 if not exist %curl-ca-bundle% goto :EOF
-sed -i -e '/^===== Begin Custom CA =====$/,/^===== End Custom CA =====$/d' %curl-ca-bundle:\=/% > %curl-ca-bundle%.tmp
+sed -e "/^===== Begin Custom CA =====$/,/^===== End Custom CA =====$/d" %curl-ca-bundle:\=/% > %curl-ca-bundle%.tmp
 if not exist %curl-ca-bundle%.tmp goto :EOF
 call :chmod_644 %curl-ca-bundle%
 del %curl-ca-bundle%
