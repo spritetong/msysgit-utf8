@@ -1,0 +1,13 @@
+@echo off
+call gitx.cmd msysgit-init
+
+rem *********************** Set global user name and email.
+rem git config --global user.name "Your Name"
+rem git config --global user.email your-name@email.com
+
+rem *********************** Windows CRLF
+rem git config --global core.autocrlf true
+rem git config --global core.safecrlf false
+
+rem *********************** Show Unicode log.
+rem git config --global i18n.logoutputencoding utf-8

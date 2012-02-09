@@ -1,6 +1,6 @@
 #define APP_NAME      'Git'
 #define APP_VERSION   '%APPVERSION%'
-#define APP_URL       'http://msysgit.googlecode.com/'
+#define APP_URL       'http://msysgit-utf8.googlecode.com/'
 #define APP_BUILTINS  'etc\fileList-builtins.txt'
 #define APP_BINDIMAGE 'etc\fileList-bindimage.txt'
 
@@ -456,7 +456,8 @@ begin
     end;
 
     // Restore the setting chosen during a previous install.
-    Data:=GetPreviousData('Path Option','BashOnly');
+    //********** Changed by Sprite Tong, 2/7/2011. *********
+    Data:=GetPreviousData('Path Option','Cmd');
     if Data='BashOnly' then begin
         RdbPath[GP_BashOnly].Checked:=True;
     end else if Data='Cmd' then begin
@@ -721,6 +722,21 @@ begin
         end;
     end;
 
+    //********** Added by Sprite Tong, 2/7/2012. *********
+    // Uncheck Windows shell integration by default.
+    if CurPageID=wpSelectComponents then begin
+        for i:=0 to WizardForm.ComponentsList.Items.Count-1 do begin
+            if Pos('icons',LowerCase(WizardForm.ComponentsList.ItemCaption[i]))>0 then begin
+                WizardForm.ComponentsList.Checked[i]:=False;
+            end else if Pos('integration',LowerCase(WizardForm.ComponentsList.ItemCaption[i]))>0 then begin
+                WizardForm.ComponentsList.Checked[i]:=False;
+            end else if Pos('.sh files',LowerCase(WizardForm.ComponentsList.ItemCaption[i]))>0 then begin
+                WizardForm.ComponentsList.Checked[i]:=False;
+            end;
+        end;
+    end;
+    //*****************************************************
+
     // Show the "Refresh" button only on the processes page.
     if (ProcessesPage<>NIL) and (CurPageID=ProcessesPage.ID) then begin
         ProcessesRefresh.Show;
@@ -902,6 +918,11 @@ begin
         // This is not a critical error, Git could basically be used without the
         // aliases for built-ins, so we continue.
     end;
+
+    //********** Added by Sprite Tong, 2/9/2012. *********
+    // Initialize msysgit environment for UTF-8.
+    ShellExec('', ExpandConstant('{app}\cmd\gitx.cmd'), 'msysgit-init', '', SW_HIDE, ewWaitUntilTerminated, Count);
+    //****************************************************
 
     {
         Adapt core.autocrlf
@@ -1315,6 +1336,11 @@ begin
     if CurUninstallStep<>usUninstall then begin
         Exit;
     end;
+
+    //********** Added by Sprite Tong, 2/9/2012. *********
+    // Uninitialize msysgit environment for UTF-8.
+    ShellExec('', ExpandConstant('{app}\cmd\gitx.cmd'), 'msysgit-uninit', '', SW_HIDE, ewWaitUntilTerminated, i);
+    //****************************************************
 
     // Reset the console font (the FontType is reset in the Registry section).
     if IsComponentInstalled('consolefont') then begin
