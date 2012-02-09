@@ -3,7 +3,7 @@ setlocal
 setlocal ENABLEDELAYEDEXPANSION
 
 for /F "delims=" %%I in ("%~dp0..") do set git_install_root=%%~fI
-set PATH=%git_install_root%\bin;%git_install_root%\mingw\bin;%git_install_root%\cmd;%PATH%
+set PATH=%git_install_root%\cmd;%git_install_root%\bin;%git_install_root%\mingw\bin;%PATH%
 
 set opt_rebase=0
 set opt_fixurl=0
