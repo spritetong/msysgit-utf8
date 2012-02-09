@@ -1,9 +1,14 @@
 #!/bin/bash
 
-if test $# -lt 1
-then
+maketag=0
+if [ "$1" = "--tag" ]; then
+    maketag=1
+    shift
+fi
+
+if [ $# -lt 1 ]; then
     echo 'Usage:'
-    echo '   ./release-utf8.sh <version>'
+    echo '   ./release-utf8.sh [--tag] <version>'
     exit
 fi
 
@@ -13,23 +18,20 @@ fullversion=$version-msysgit-utf8-$build
 
 echo $fullversion>/git/version
 
-pushd /git >nul
-git tag -d v$fullversion >nul 2>nul
-git tag    v$fullversion
-cd /
-git tag -d Git-$fullversion >nul 2>nul
-popd >nul
-
-# Change curl-ca-bundle.crt
-cmd /c "..\\..\\cmd\\git-config-win.cmd"
+if [ $maketag -eq 1 ]; then
+    pushd /git >nul
+    git tag -d v$fullversion >nul 2>nul
+    git tag    v$fullversion
+    cd /
+    git tag -d Git-$fullversion >nul 2>nul
+    git tag    Git-$fullversion
+    popd >nul
+fi
 
 # Copy libiconv-2.dll
 cp /mingw/bin/libiconv-2.dll /libexec/git-core/
 
 ./release.sh -f $fullversion
-
-# Restore curl-ca-bundle.crt
-git checkout -f ../../mingw/bin/curl-ca-bundle.crt
 
 # Delete version file
 rm -f /git/version
