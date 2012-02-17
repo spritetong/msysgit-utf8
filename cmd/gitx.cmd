@@ -3,7 +3,7 @@ setlocal
 setlocal ENABLEDELAYEDEXPANSION
 
 for /F "delims=" %%I in ("%~dp0..") do set git_install_root=%%~fI
-set PATH=%git_install_root%\bin;%git_install_root%\mingw\bin;%git_install_root%\cmd;%PATH%
+set PATH=%git_install_root%\cmd;%git_install_root%\bin;%git_install_root%\mingw\bin;%PATH%
 
 set opt_rebase=0
 set opt_fixurl=0
@@ -92,19 +92,19 @@ rem ****************************************************************************
 rem * Initialize msysgit environment
 rem ****************************************************************************
 :gitx_msysgit_init
-fsutil >nul 2>nul
-if %errorlevel% neq 0 (
-	echo User privilege is insufficient.
-	echo Please run this script As Administrator.
-	echo.
-	pause
-	goto :EOF
-)
+call :gitx_msysgit_uninit
+if %errorlevel% neq 0 goto :EOF
 pushd %git_install_root%\cmd >nul
+call :gmi_upgrade
 call :gmi_config
 call :gmi_add_custom_cacerts
 call :gmi_set_all_loaders
 popd
+goto :EOF
+
+:gmi_upgrade
+if exist CustomCA.crt       ren CustomCA.crt custom-ca-bundle.crt >nul 2>nul
+if exist git-config-win.cmd rm -f git-config-win.cmd git-svn-fetch.cmd git-update-dir.cmd
 goto :EOF
 
 :gmi_config
@@ -170,8 +170,8 @@ if %errorlevel% neq 0 (
 )
 pushd %git_install_root%\cmd >nul
 rm -f git?*.exe
-if exist default\git.cmd  move /y default\git.cmd  git.cmd  >nul
-if exist default\gitk.cmd move /y default\gitk.cmd gitk.cmd >nul
+call :gmu_remove_cmd git.cmd
+call :gmu_remove_cmd gitk.cmd
 call :gmu_remove_def custom-ca-bundle.crt custom-ca-bundle.def
 call :gmu_remove_def git-ldr.ini          git-ldr.def
 call :gmu_remove_def git-config-init.cmd  git-config-init.def
@@ -179,10 +179,26 @@ rd default >nul 2>nul
 popd
 goto :EOF
 
+:gmu_remove_cmd
+if exist default\%1 (
+	if exist %1 (
+		del default\%1 >nul
+	) else (
+		move /y default\%1 %1 >nul
+	)
+)
+goto :EOF
+
 :gmu_remove_def
-if exist default\%2 move /y default\%2 %2 >nul
-cmp %1 %2 >nul 2>nul
-if %errorlevel% equ 0 del %1
+if exist default\%2 (
+	cmp %1 default\%2 >nul 2>nul
+	if !errorlevel! equ 0 del %1 >nul
+	if exist %2 (
+		del default\%2 >nul
+	) else (
+		move /y default\%2 %2 >nul
+	)
+)
 goto :EOF
 
 rem ****************************************************************************
@@ -288,7 +304,7 @@ popd
 rem #--------- Update .git file in submodule working directory.
 if not exist "%~1/%module_path%/" (
 	mkdir "%~1/%module_path%" >nul 2>nul
-	if %errorlevel% neq 0 (
+	if !errorlevel! neq 0 (
 		echo Error: can not make direcotry "%module_path%/".
 		goto :EOF
 	)
