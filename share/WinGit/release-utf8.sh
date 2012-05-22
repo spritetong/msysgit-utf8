@@ -12,6 +12,13 @@ if [ $# -lt 1 ]; then
     exit
 fi
 
+# Curl Http Proxy
+export http_proxy='127.0.0.1:9999'
+echo " "
+echo "Set CURL HTTP Proxy [$http_proxy]."
+echo " "
+sleep 1
+
 version=$1
 build=$(date +%Y%m%d)
 fullversion=$version-msysgit-utf8-$build

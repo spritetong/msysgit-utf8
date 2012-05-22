@@ -4,7 +4,7 @@ cd "$(dirname "$0")"
 srcdir=$(pwd)
 
 mirror=http://zlib.net/
-file=zlib-1.2.6.tar.gz
+file=zlib-1.2.7.tar.gz
 dir=${file%.tar.gz}
 
 # download it
@@ -27,7 +27,7 @@ test -d $dir/.git ||
 # patch it
 if ! grep DISABLED_MINGW $dir/configure > /dev/null 2>&1
 then
-	(cd $dir && git apply --verbose ../patch/zlib-config.patch) || exit
+	(cd $dir && git apply --verbose --ignore-space-change ../patch/zlib-config.patch) || exit
 fi
 
 # compile it

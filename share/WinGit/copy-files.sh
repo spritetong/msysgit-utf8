@@ -100,6 +100,6 @@ cp $MSYSGITROOT/mingw/bin/libiconv-2.dll libexec/git-core/ &&
 # *************************************************************
 sed 's/^\. .*\(git-completion.bash\)/. \/etc\/\1/' \
 	< $MSYSGITROOT/etc/profile > etc/profile &&
-cp $MSYSGITROOT/share/resources/git.ico etc/ ||
+cp $MSYSGITROOT/share/resources/git.ico etc/ &&
 find bin libexec -iname \*.exe -o -iname \*.dll | sort > etc/fileList-bindimage.txt ||
 exit 1
