@@ -26,7 +26,9 @@ AppPublisherURL={#APP_URL}
 AppVersion={#APP_VERSION}
 ChangesEnvironment=yes
 DefaultDirName={pf}\{#APP_NAME}
+DisableDirPage=auto
 DefaultGroupName={#APP_NAME}
+DisableProgramGroupPage=auto
 DisableReadyPage=yes
 InfoBeforeFile=gpl-2.0.rtf
 PrivilegesRequired=none
@@ -117,14 +119,14 @@ Root: HKCU; Subkey: Software\Classes\.gitmodules; ValueType: string; ValueName: 
 ; Install under HKEY_LOCAL_MACHINE if an administrator is installing.
 Root: HKLM; Subkey: Software\Classes\.sh; ValueType: string; ValueData: sh_auto_file; Flags: createvalueifdoesntexist uninsdeletekeyifempty uninsdeletevalue; Check: IsAdminLoggedOn; Components: assoc_sh
 Root: HKLM; Subkey: Software\Classes\sh_auto_file; ValueType: string; ValueData: "Shell Script"; Flags: createvalueifdoesntexist uninsdeletekeyifempty uninsdeletevalue; Check: IsAdminLoggedOn; Components: assoc_sh
-Root: HKLM; Subkey: Software\Classes\sh_auto_file\shell\open\command; ValueType: string; ValueData: """{app}\bin\sh.exe"" ""--login"" ""%1"" %*"; Flags: createvalueifdoesntexist uninsdeletekeyifempty uninsdeletevalue; Check: IsAdminLoggedOn; Components: assoc_sh
+Root: HKLM; Subkey: Software\Classes\sh_auto_file\shell\open\command; ValueType: string; ValueData: "{syswow64}\cmd.exe /C """"{app}\bin\sh.exe"" ""--login"" ""%1"" %*"""; Flags: createvalueifdoesntexist uninsdeletekeyifempty uninsdeletevalue; Check: IsAdminLoggedOn; Components: assoc_sh
 Root: HKLM; Subkey: Software\Classes\sh_auto_file\DefaultIcon; ValueType: string; ValueData: "%SystemRoot%\System32\shell32.dll,-153"; Flags: createvalueifdoesntexist uninsdeletekeyifempty uninsdeletevalue; Check: IsAdminLoggedOn; Components: assoc_sh
 Root: HKLM; Subkey: Software\Classes\sh_auto_file\ShellEx\DropHandler; ValueType: string; ValueData: {#DROP_HANDLER_GUID}; Flags: createvalueifdoesntexist uninsdeletekeyifempty uninsdeletevalue; Check: IsAdminLoggedOn; Components: assoc_sh
 
 ; Install under HKEY_CURRENT_USER if a non-administrator is installing.
 Root: HKCU; Subkey: Software\Classes\.sh; ValueType: string; ValueData: sh_auto_file; Flags: createvalueifdoesntexist uninsdeletekeyifempty uninsdeletevalue; Check: not IsAdminLoggedOn; Components: assoc_sh
 Root: HKCU; Subkey: Software\Classes\sh_auto_file; ValueType: string; ValueData: "Shell Script"; Flags: createvalueifdoesntexist uninsdeletekeyifempty uninsdeletevalue; Check: not IsAdminLoggedOn; Components: assoc_sh
-Root: HKCU; Subkey: Software\Classes\sh_auto_file\shell\open\command; ValueType: string; ValueData: """{app}\bin\sh.exe"" ""--login"" ""%1"" %*"; Flags: createvalueifdoesntexist uninsdeletekeyifempty uninsdeletevalue; Check: not IsAdminLoggedOn; Components: assoc_sh
+Root: HKCU; Subkey: Software\Classes\sh_auto_file\shell\open\command; ValueType: string; ValueData: "{syswow64}\cmd.exe /C """"{app}\bin\sh.exe"" ""--login"" ""%1"" %*"""; Flags: createvalueifdoesntexist uninsdeletekeyifempty uninsdeletevalue; Check: not IsAdminLoggedOn; Components: assoc_sh
 Root: HKCU; Subkey: Software\Classes\sh_auto_file\DefaultIcon; ValueType: string; ValueData: "%SystemRoot%\System32\shell32.dll,-153"; Flags: createvalueifdoesntexist uninsdeletekeyifempty uninsdeletevalue; Check: not IsAdminLoggedOn; Components: assoc_sh
 Root: HKCU; Subkey: Software\Classes\sh_auto_file\ShellEx\DropHandler; ValueType: string; ValueData: {#DROP_HANDLER_GUID}; Flags: createvalueifdoesntexist uninsdeletekeyifempty uninsdeletevalue; Check: not IsAdminLoggedOn; Components: assoc_sh
 
@@ -157,13 +159,6 @@ function CreateHardLink(lpFileName,lpExistingFileName:String;lpSecurityAttribute
 external 'CreateHardLinkW@Kernel32.dll stdcall delayload setuponly';
 #else
 external 'CreateHardLinkA@Kernel32.dll stdcall delayload setuponly';
-#endif
-
-function CreateSymbolicLink(lpSymlinkFileName,lpTargetFileName:String;dwFlags:DWORD):Boolean;
-#ifdef UNICODE
-external 'CreateSymbolicLinkW@Kernel32.dll stdcall delayload setuponly';
-#else
-external 'CreateSymbolicLinkA@Kernel32.dll stdcall delayload setuponly';
 #endif
 
 function BindImageEx(Flags:DWORD;ImageName,DllPath,SymbolPath:AnsiString;StatusRoutine:Integer):Boolean;
@@ -513,7 +508,7 @@ begin
             Parent:=PuTTYPage.Surface;
             Caption:=
                 'PuTTY sessions were found in your Registry. You may specify the path' + #13 +
-                'to an existing copy of (Tortoise)Plink.exe from the TortoiseSVN/CVS' + #13 +
+                'to an existing copy of (Tortoise)Plink.exe from the TortoiseGit/SVN/CVS' + #13 +
                 'or PuTTY applications. The GIT_SSH and SVN_SSH environment' + #13 +
                 'variables will be adjusted to point to the following executable:';
             Left:=ScaleX(28);
@@ -861,21 +856,11 @@ begin
             end;
 
             try
-                // This will throw an exception on pre-WinVista systems.
-                LinkCreated:=CreateSymbolicLink(FileName,AppDir+'\bin\git.exe',0);
+                // This will throw an exception on pre-Win2k systems.
+                LinkCreated:=CreateHardLink(FileName,AppDir+'\bin\git.exe',0);
             except
                 LinkCreated:=False;
-                Log('Line {#__LINE__}: Creating symbolic link "'+FileName+'" failed, will try a hard link.');
-            end;
-
-            if not LinkCreated then begin
-                try
-                    // This will throw an exception on pre-Win2k systems.
-                    LinkCreated:=CreateHardLink(FileName,AppDir+'\bin\git.exe',0);
-                except
-                    LinkCreated:=False;
-                    Log('Line {#__LINE__}: Creating hardlink "'+FileName+'" failed, will try a copy.');
-                end;
+                Log('Line {#__LINE__}: Creating hardlink "'+FileName+'" failed, will try a copy.');
             end;
 
             if not LinkCreated then begin
@@ -1140,7 +1125,7 @@ begin
 
     if IsComponentSelected('ext\reg\shellhere') then begin
         if (not RegWriteStringValue(RootKey,'SOFTWARE\Classes\Directory\shell\git_shell','','Git Ba&sh Here')) or
-           (not RegWriteStringValue(RootKey,'SOFTWARE\Classes\Directory\shell\git_shell\command','','wscript "'+AppDir+'\Git Bash.vbs" "%1"')) then begin
+           (not RegWriteStringValue(RootKey,'SOFTWARE\Classes\Directory\shell\git_shell\command','','"'+ExpandConstant('{syswow64}')+'\wscript" "'+AppDir+'\Git Bash.vbs" "%1"')) then begin
             Msg:='Line {#__LINE__}: Unable to create "Git Bash Here" shell extension.';
             MsgBox(Msg,mbError,MB_OK);
             Log(Msg);

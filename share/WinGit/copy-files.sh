@@ -65,6 +65,7 @@ vim.exe}) |
 tar xf - &&
 rm -rf bin/cvs.exe &&
 (test ! -f $MSYSGITROOT/lib/Git.pm || cp -u $MSYSGITROOT/lib/Git.pm lib/perl5/site_perl/Git.pm) &&
+(test ! -d $MSYSGITROOT/lib/Git || cp -uR $MSYSGITROOT/lib/Git lib/perl5/site_perl/Git) &&
 test -f lib/perl5/site_perl/Git.pm &&
 gitmd5=$(md5sum bin/git.exe | cut -c 1-32) &&
 mkdir etc &&
@@ -83,7 +84,6 @@ fi &&
 	lib/{tcl,tk,dde,reg}* libexec/gnupg/) |
 tar xf - &&
 cp $MSYSGITROOT/mingw/bin/hd2u.exe bin/dos2unix.exe &&
-md5sum $MSYSGITROOT/bin/msys-1.0.dll > etc/msys-1.0.dll.md5 &&
 strip bin/{[a-fh-z],g[a-oq-z]}*.exe libexec/git-core/*.exe &&
 cp $MSYSGITROOT/git/contrib/completion/git-completion.bash etc/ &&
 cp $MSYSGITROOT/etc/termcap etc/ &&
@@ -101,5 +101,6 @@ cp $MSYSGITROOT/mingw/bin/libiconv-2.dll libexec/git-core/ &&
 sed 's/^\. .*\(git-completion.bash\)/. \/etc\/\1/' \
 	< $MSYSGITROOT/etc/profile > etc/profile &&
 cp $MSYSGITROOT/share/resources/git.ico etc/ &&
+cp $MSYSGITROOT/share/resources/git.ico share/git-gui/lib/git-gui.ico &&
 find bin libexec -iname \*.exe -o -iname \*.dll | sort > etc/fileList-bindimage.txt ||
 exit 1
