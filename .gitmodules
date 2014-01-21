@@ -1,9 +1,12 @@
 [submodule "git"]
 	path = git
-	url = git://github.com/spritetong/msysgit-git-utf8.git
+	url = https://github.com/spritetong/msysgit-git-utf8.git
+    branch = spritetong/utf8
 [submodule "html"]
 	path = doc/git/html
-	url = git://github.com/gitster/git-htmldocs.git
+	url = https://github.com/gitster/git-htmldocs.git
+    branch = master
 [submodule "git-cheetah"]
 	path = src/git-cheetah
-	url = git://github.com/msysgit/Git-Cheetah.git
+	url = https://github.com/msysgit/Git-Cheetah.git
+    branch = master

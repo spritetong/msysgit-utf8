@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# Rebase 'devel' on top of an upstream branch (defaults to 'junio/next'),
+# Rebase 'master' on top of an upstream branch (defaults to 'junio/next'),
 # retaining "fast-forwardability" by "merging" (with the "ours" strategy) the
 # previous state on top of the current upstream state.
 #
@@ -103,6 +103,19 @@ for commit in $(list_merges $TO..)
 do
 	if is_ours_merge $commit
 	then
+		subject="$(git show -s --format=%s $commit)"
+		case "$subject" in
+		*merging-rebase*) ;;
+		*)
+			printf "%s\n\n%s\n%s\n\n(y/n) " \
+				"Is this the latest merging rebase?" \
+				$commit "$subject"
+			read answer
+			case "$answer" in
+			y*|Y*) ;;
+			*) continue;;
+			esac;;
+		esac
 		REBASING_BASE=$commit
 		break
 	fi
@@ -139,32 +152,4 @@ then
 	exit
 fi
 
-# Fake our own editor to inject initial steps into the edit script
-TODO_EXTRA="$(git rev-parse --git-dir)/.todo-extra"
-printf "%s\n\n%s\n%s" "Start the merging-rebase to $TO" \
-	"This commit starts the rebase of $FROM_SHA1 to $TO_SHA1" \
-	"$BASE_MESSAGE" > "$TODO_EXTRA.msg"
-cat > "$TODO_EXTRA" << EOF
-# Start the merging rebase:
-# Reset to $TO and ...
-exec git reset --hard $TO
-# ... fake-merge current $HEAD_NAME
-exec git merge -s ours -m "\$(cat "$TODO_EXTRA.msg")" $FROM_SHA1
-
-# Patches to rebase:
-EOF
-TMP_EDITOR="$(git rev-parse --git-dir)/.rebasing-editor.sh" &&
-cat > "$TMP_EDITOR" << EOF &&
-#!/bin/sh
-case "\$1" in
-*/git-rebase-todo)
-	# prepend the initialising commands
-	cat "\$1" >> "$TODO_EXTRA" &&
-	mv "$TODO_EXTRA" "\$1"
-esac &&
-exec "$(git var GIT_EDITOR)" "\$@"
-EOF
-chmod a+x "$TMP_EDITOR"
-
-# Rebase!
-GIT_EDITOR="$TMP_EDITOR" git rebase --autosquash -i ${REBASING_BASE:-$TO}
+exec "$(dirname "$0")"/shears.sh --merging --onto=$TO ${REBASING_BASE:-$TO}

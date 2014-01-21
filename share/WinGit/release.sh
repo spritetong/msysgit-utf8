@@ -81,6 +81,10 @@ test "$do_compile" && {
 		 # Modified by Sprite Tong, 12/1/2011.
 		 #create_msysgit_tag $version &&
 		 make install) &&
+		(cd git/contrib/subtree &&
+			make install INSTALL=/bin/install prefix=) &&
+		(cd git/contrib/credential/wincred &&
+			make install INSTALL=/bin/install prefix=) &&
 		/src/mingw-w64/release-easy.sh &&
 		/src/mingw-w64/release-zlib.sh &&
 		(cd src/git-cheetah/explorer/ &&
@@ -118,6 +122,12 @@ test -z "$force" && {
 			;;
 		*/git-gui--askpass|*/git-gui--askyesno|*/git-gui.tcl)
 			basename=git-gui/$(basename "$f")
+			;;
+		*/git-subtree)
+			basename=contrib/subtree/$(basename "$f")
+			;;
+		*/git-credential-wincred.exe)
+			basename=contrib/credential/wincred/$(basename "$f")
 			;;
 		*)
 			basename=$(basename "$f")
